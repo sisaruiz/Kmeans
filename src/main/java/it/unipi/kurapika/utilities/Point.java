@@ -46,4 +46,25 @@ public class Point implements Writable {
 		coordinates.readFields(in);
 	}
 	
+	public void parse(String values) {
+        String[] coords = values.split(" ");
+        double[] tmp = new double[coords.length];
+        for (int i = 0; i < tmp.length; i++) {
+            tmp[i] = Double.valueOf(coords[i]);
+        }
+
+        coordinates.set(tmp);
+        dimension.set(coords.length);
+    }
+	
+	public double getDistance(Point centroid) {
+		double sum = 0;
+		double [] thisCoord = (double[])this.coordinates.get();
+		double [] centrCoord = (double[])centroid.coordinates.get();
+		
+        for (int i = 0; i < this.dimension.get(); i++) {
+            sum += Math.pow(Math.abs(thisCoord[i] - centrCoord[i]), 2);
+        }
+        return Math.sqrt(sum);
+	}
 }

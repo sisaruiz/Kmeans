@@ -17,6 +17,11 @@ public class Centroid implements WritableComparable<Centroid>{
         point = new Point();
 	}
 	
+	public Centroid(Centroid center) {
+		this.index = center.index;
+        point = new Point(center.point);
+	}
+	
 	public Centroid(Text index, Point point) {
 		
 		this.index = index;

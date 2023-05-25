@@ -8,6 +8,8 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import java.util.Arrays;
+
 public class Point implements Writable {
 	
 	private IntWritable dimension;
@@ -16,6 +18,12 @@ public class Point implements Writable {
 	public Point() {
 		this.dimension = new IntWritable(0);
 		this.coordinates = new ArrayPrimitiveWritable();
+	}
+	
+	public Point(Point point) {
+		this.dimension = point.dimension;
+		double[] vector = (double[])point.coordinates.get();
+        this.coordinates.set(Arrays.copyOf(vector, vector.length));
 	}
 	
 	public Point(double[] seq, int dim) {

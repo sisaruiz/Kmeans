@@ -47,5 +47,9 @@ public class Centroid implements WritableComparable<Centroid>{
 		// TODO Auto-generated method stub
 		return this.index.compareTo(o.index);
 	}
+	
+	public Point getPoint() {
+		return this.point;
+	}
 
 }

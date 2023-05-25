@@ -14,22 +14,19 @@ public class Point implements Writable {
 	
 	private IntWritable dimension;
 	private ArrayPrimitiveWritable coordinates = null;
+	private IntWritable numPoints;
 	
 	public Point() {
 		this.dimension = new IntWritable(0);
 		this.coordinates = new ArrayPrimitiveWritable();
+		this.numPoints.set(1);
 	}
 	
 	public Point(Point point) {
 		this.dimension = point.dimension;
 		double[] vector = (double[])point.coordinates.get();
         this.coordinates.set(Arrays.copyOf(vector, vector.length));
-	}
-	
-	public Point(double[] seq, int dim) {
-		this();
-		this.coordinates.set(seq);
-		this.dimension.set(dim);
+        this.numPoints.set(point.numPoints.get());
 	}
 	
 	@Override
@@ -37,6 +34,7 @@ public class Point implements Writable {
 		// TODO Auto-generated method stub
 		dimension.write(out);
 		coordinates.write(out);
+		numPoints.write(out);
 	}
 
 	@Override
@@ -44,6 +42,7 @@ public class Point implements Writable {
 		// TODO Auto-generated method stub
 		dimension.readFields(in);
 		coordinates.readFields(in);
+		numPoints.readFields(in);
 	}
 	
 	public void parse(String values) {
@@ -66,5 +65,18 @@ public class Point implements Writable {
             sum += Math.pow(Math.abs(thisCoord[i] - centrCoord[i]), 2);
         }
         return Math.sqrt(sum);
+	}
+	
+	public void sum(Point p) {
+		double [] thisCoord = (double[])this.coordinates.get();
+		double [] otherCoord = (double[])p.coordinates.get();
+		
+		for (int i = 0; i < this.dimension.get(); i++) {
+            thisCoord[i] += otherCoord[i];
+        }
+		
+		this.coordinates.set(thisCoord);
+		
+        this.numPoints.set(this.numPoints.get()+p.numPoints.get());
 	}
 }

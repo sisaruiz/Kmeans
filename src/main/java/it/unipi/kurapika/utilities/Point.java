@@ -19,6 +19,10 @@ public class Point implements Writable {
 	public Point() {
 		this.dimension = new IntWritable(0);
 		this.coordinates = new ArrayPrimitiveWritable();
+		double[] vector = new double[this.dimension.get()];
+		for (int i=0; i<this.dimension.get(); i++) {
+			vector[i] = 0;
+		}
 		this.numPoints.set(1);
 	}
 	
@@ -79,4 +83,19 @@ public class Point implements Writable {
 		
         this.numPoints.set(this.numPoints.get()+p.numPoints.get());
 	}
+	
+	public void compress() {
+		double [] toUpdateCoord = (double[])this.coordinates.get();
+		
+		for(int i=0; i<this.dimension.get(); i++) {
+			toUpdateCoord[i] = toUpdateCoord[i]/this.numPoints.get();
+		}
+		this.coordinates.set(toUpdateCoord);
+		this.numPoints.set(1);
+	}
 }
+
+
+
+
+

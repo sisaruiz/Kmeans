@@ -51,5 +51,9 @@ public class Centroid implements WritableComparable<Centroid>{
 	public Point getPoint() {
 		return this.point;
 	}
+	
+	public void setIndex(Centroid cen) {
+		this.index.set(cen.index);
+	}
 
 }

@@ -45,22 +45,4 @@ public class KmeansReducer extends Reducer<Centroid, Point, Centroid, NullWritab
     	}
     }
     
-    
-    // cleanup still to be updated!
-    @Override
-	protected void cleanup(Context context) throws IOException, InterruptedException {
-		
-		Configuration conf = context.getConfiguration();
-		Path outPath = new Path(conf.get("centroids"));
-		FileSystem fs = FileSystem.get(conf);
-		fs.delete(outPath, true);
-		try (SequenceFile.Writer out = SequenceFile.createWriter(fs, context.getConfiguration(), outPath,
-				Centroid.class, IntWritable.class)) {
-			final IntWritable value = new IntWritable(0);
-			for (Centroid center : centers) {
-				out.append(center, value);
-			}
-		}
-	}
-    
 }

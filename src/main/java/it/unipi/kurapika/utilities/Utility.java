@@ -8,7 +8,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.conf.Configuration;
 
 public class Utility {
@@ -32,6 +36,8 @@ public class Utility {
 		        
 		        //File reading utils
 		        Path dataPath = new Path(pathString);
+		        FileSystem hdfs = FileSystem.get(conf);
+		        FSDataInputStream in = hdfs.open(dataPath);
 		        BufferedReader br = new BufferedReader(new InputStreamReader(in));
 
 		        //Get centroids from the file
@@ -52,4 +58,16 @@ public class Utility {
 		        
 		    	return points;
 		    }
+	
+	public static void writeExampleCenters(Configuration conf, Path center, Point[] points) throws IOException {
+		try (SequenceFile.Writer centerWriter = SequenceFile.createWriter(conf, SequenceFile.Writer.file(center) , 
+				SequenceFile.Writer.keyClass(Centroid.class), SequenceFile.Writer.valueClass(IntWritable.class))) {
+			final IntWritable value = new IntWritable(0);
+			for (Point point : points) {
+				centerWriter.append(point, value);
+			}
+			
+		}
+	}
+
 }

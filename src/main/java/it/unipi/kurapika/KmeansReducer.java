@@ -4,12 +4,13 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.SequenceFile;
-import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.ArrayList;
 
 import it.unipi.kurapika.utilities.*;
 
@@ -18,6 +19,8 @@ public class KmeansReducer extends Reducer<Centroid, Point, Centroid, NullWritab
 	public static enum Counter {
 		CONVERGED
 	}
+	
+	private final List<Centroid> centers = new ArrayList<>();
 	
 	private Double epsilon = 0.;
 	
@@ -38,11 +41,28 @@ public class KmeansReducer extends Reducer<Centroid, Point, Centroid, NullWritab
     	newKey.getPoint().compress();
     	newKey.setIndex(key);
     	
+    	centers.add(newKey);
     	context.write(newKey, NullWritable.get());
     	
     	if (key.getPoint().getDistance(newKey.getPoint()) > epsilon) {
     		context.getCounter(Counter.CONVERGED).increment(1);
     	}
     }
+    
+    @Override
+	protected void cleanup(Context context) throws IOException, InterruptedException {
+
+		Configuration conf = context.getConfiguration();
+		Path outPath = new Path(conf.get("centroids"));
+		FileSystem fs = FileSystem.get(conf);
+		fs.delete(outPath, true);
+		try (SequenceFile.Writer out = SequenceFile.createWriter(conf, SequenceFile.Writer.file(outPath),
+				SequenceFile.Writer.keyClass(Centroid.class))) {
+			final IntWritable value = new IntWritable(0);
+			for (Centroid center : centers) {
+				out.append(center, value);
+			}
+		}
+	}
     
 }

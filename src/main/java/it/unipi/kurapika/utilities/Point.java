@@ -93,6 +93,19 @@ public class Point implements Writable {
 		this.coordinates.set(toUpdateCoord);
 		this.numPoints.set(1);
 	}
+	
+	public String toString() {
+		String string = new String();
+		double [] thisCoord = (double[])this.coordinates.get();
+		
+		for(int i=0; i<this.dimension.get(); i++) {
+			string.concat(Double.toString(thisCoord[i]));
+			string.concat(" ");
+		}
+		string.concat("\n");
+		
+		return string;
+	}
 }
 
 

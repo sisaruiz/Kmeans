@@ -3,12 +3,7 @@ package it.unipi.kurapika;
 import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.FileStatus;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.util.GenericOptionsParser;
@@ -16,8 +11,6 @@ import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
-import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 
 import it.unipi.kurapika.utilities.*;
@@ -27,92 +20,77 @@ public class Kmeans {
 
 	public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException {
 		// TODO Auto-generated method stub
-		int iteration = 1;
-		final String SEP = System.getProperty("file.separator");
-		Configuration conf = new Configuration(); 
-		conf.addResource(new Path("config.xml"));
-		conf.set("num.iteration", iteration + "");
-		
-		final int DATASET_SIZE = conf.getInt("dataset", 10);
-        final int DISTANCE = conf.getInt("distance", 2);
+		Configuration conf = new Configuration();
+        conf.addResource(new Path("configuration.xml")); 
+
+        String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
+
+        if (otherArgs.length != 2) {
+            System.err.println("Usage: <input> <output>");
+            System.exit(1);
+        }
+
+        // set parameters
+        final String INPUT = otherArgs[0];
+        final String OUTPUT = otherArgs[1] + "/temp";
+        final int DATASET_SIZE = conf.getInt("dataset", 100);
+        final String CENTROIDS_PATH = conf.get("centroids");
         final int K = conf.getInt("k", 3);
-		
-		Path in = new Path("files/clustering/import/data");
-		Path center = new Path("files/clustering/import/center/cen.seq");
-		conf.set("centroids", center.toString());
-		Path out =  new Path(conf.get("output") + SEP + String.valueOf(conf.getInt("iteration", 0)));
-		
-		FileSystem fs = FileSystem.get(conf);
-		if (fs.exists(out)) {
-			fs.delete(out, true);
-		}
+        final int MAX_ITERATIONS = conf.getInt("iterations", 20);
 
-		if (fs.exists(center)) {
-			fs.delete(out, true);
-		}
+        Point[] newCentroids = new Point[K];
 
-		if (fs.exists(in)) {
-			fs.delete(in, true);
-		}
-		
-		Job job = Job.getInstance(conf);
-		
-		FileOutputFormat.setOutputPath(job, in);
-        FileInputFormat.addInputPath(job, out);
+        // generate initial centroids
+        newCentroids = Utility.generateCentroids(conf, INPUT, K, DATASET_SIZE);
+        Utility.writeCentroids(conf, new Path(CENTROIDS_PATH), newCentroids);
+
+        boolean stop = false;
+        boolean succeded = true;
+        int iteration = 0;
+        while(!stop) {
+            iteration++;
+            
+            // set job configuration
+            Job job = Job.getInstance(conf, "iter_" + iteration);
+            
+            job.setJarByClass(Kmeans.class);
+            job.setMapperClass(KmeansMapper.class);
+            job.setCombinerClass(KmeansCombiner.class);
+            job.setReducerClass(KmeansReducer.class);  
+            
+            job.setNumReduceTasks(K); 	           
+            
+            job.setOutputKeyClass(Centroid.class);
+            job.setOutputValueClass(NullWritable.class);
+            
+            FileInputFormat.addInputPath(job, new Path(INPUT));
+            FileOutputFormat.setOutputPath(job, new Path(OUTPUT));
+            
+            job.setInputFormatClass(TextInputFormat.class);
+            job.setOutputFormatClass(SequenceFileOutputFormat.class);
+
+            succeded = job.waitForCompletion(true);
+
+            if(!succeded) {		// if a job fails exit program
+                System.err.println("Job" + iteration + "failed.");
+                System.exit(1);	
+            }
+
+            // check centroids' convergence
+            stop = (0L == job.getCounters().findCounter(KmeansReducer.Counter.CONVERGED).getValue());
+
+            // if centroids converged or the maximum number of iterations has been reached
+            if(stop || iteration == (MAX_ITERATIONS -1)) {
+            	// write final centroids in output file
+                Utility.writeOutput(conf, new Path(CENTROIDS_PATH), new Path(otherArgs[1]));
+                stop = true;	// stop iterations
+            }
+        }
         
-		job.setJarByClass(Kmeans.class);
-		job.setMapperClass(KmeansMapper.class);
-		job.setCombinerClass(KmeansCombiner.class);
-		job.setReducerClass(KmeansReducer.class);
+        System.out.println("n_iter: " + iteration);
+
+        System.exit(0);		
 		
-		Point[] newCentroids = null;
-		newCentroids = Utility.centroidsInit(conf, in.toString(), K, DATASET_SIZE);
-		Utility.writeExampleCenters(conf, center, newCentroids);
-		
-		
-		job.setMapOutputKeyClass(Centroid.class);
-	    job.setMapOutputValueClass(Point.class);
-	    job.setOutputKeyClass(Centroid.class);
-	    job.setOutputValueClass(NullWritable.class);		
-		job.setInputFormatClass(SequenceFileInputFormat.class);
-		job.setOutputFormatClass(SequenceFileOutputFormat.class);
-
-		job.waitForCompletion(true);
-		
-		long counter = job.getCounters().findCounter(KmeansReducer.Counter.CONVERGED).getValue();
-		iteration++;
-		
-		while (counter > 0) {
-			conf = new Configuration();
-			conf.set("centroid.path", center.toString());
-			conf.set("num.iteration", iteration + "");
-			job = Job.getInstance(conf);
-			job.setJobName("KMeans Clustering " + iteration);
-
-			job.setMapperClass(KmeansMapper.class);
-			job.setReducerClass(KmeansReducer.class);
-			job.setJarByClass(KmeansMapper.class);
-
-			in = new Path("files/clustering/depth_" + (iteration - 1) + "/");
-			out = new Path("files/clustering/depth_" + iteration);
-
-			FileInputFormat.addInputPath(job, in);
-			if (fs.exists(out))
-				fs.delete(out, true);
-
-			FileOutputFormat.setOutputPath(job, out);
-			job.setMapOutputKeyClass(Centroid.class);
-		    job.setMapOutputValueClass(Point.class);
-		    job.setOutputKeyClass(Centroid.class);
-		    job.setOutputValueClass(NullWritable.class);		
-			job.setInputFormatClass(SequenceFileInputFormat.class);
-			job.setOutputFormatClass(SequenceFileOutputFormat.class);
-
-			job.waitForCompletion(true);
-			iteration++;
-			counter = job.getCounters().findCounter(KmeansReducer.Counter.CONVERGED).getValue();
-		}
-
 	}
 	
 }

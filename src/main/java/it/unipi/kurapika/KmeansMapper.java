@@ -2,7 +2,7 @@ package it.unipi.kurapika;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.String;
+import java.lang.*;
 import java.util.ArrayList;
 
 import org.apache.hadoop.conf.Configuration;
@@ -44,7 +44,7 @@ public class KmeansMapper extends Mapper<LongWritable, Text, Centroid, Point>{
 	@Override
 	protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 		
-		Centroid cluster = null;			// centroid to be assigned
+		Centroid cluster = new Centroid();			// centroid to be assigned
 		point.parse(value.toString());			// convert data value to Point
 		
 		double minimumDistance = Double.MAX_VALUE;	// assign maximum value as default minimum distance

@@ -23,7 +23,7 @@ public class KmeansMapper extends Mapper<LongWritable, Text, Centroid, Point>{
 	protected void setup(Context context) throws IOException, InterruptedException {
 		
 		Configuration conf = context.getConfiguration();
-		Path centroidsPath = new Path(conf.get("centroids")); 	// path containing sequence file to read
+		Path centroidsPath = new Path(conf.get("centroids.path","centroids.txt")); 	// path containing sequence file to read
 
 		try (SequenceFile.Reader reader = new SequenceFile.Reader(conf, SequenceFile.Reader.file(centroidsPath))) {
 			

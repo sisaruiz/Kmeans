@@ -64,7 +64,7 @@ public class Utility {
 	
 	public static void writeCentroids(Configuration conf, Path center, Point[] points) throws IOException {
 		try (SequenceFile.Writer centerWriter = SequenceFile.createWriter(conf, SequenceFile.Writer.file(center) , 
-				SequenceFile.Writer.keyClass(Centroid.class), SequenceFile.Writer.valueClass(IntWritable.class))) {
+				SequenceFile.Writer.keyClass(Point.class), SequenceFile.Writer.valueClass(IntWritable.class))) {
 			final IntWritable value = new IntWritable(0);
 			for (Point point : points) {
 				centerWriter.append(point, value);

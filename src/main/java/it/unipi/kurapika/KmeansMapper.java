@@ -2,6 +2,7 @@ package it.unipi.kurapika;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.String;
 import java.util.ArrayList;
 
 import org.apache.hadoop.conf.Configuration;
@@ -27,11 +28,14 @@ public class KmeansMapper extends Mapper<LongWritable, Text, Centroid, Point>{
 
 		try (SequenceFile.Reader reader = new SequenceFile.Reader(conf, SequenceFile.Reader.file(centroidsPath))) {
 			
-			Centroid key = new Centroid();
+			Point key = new Point();
+			int i = 0;
 			
 			while (reader.next(key)) {			// iterate over records
-				Centroid center = new Centroid(key);	// create new centroid 
+				
+				Centroid center = new Centroid(String.valueOf(i),key);	// create new centroid 
 				centroids.add(center);			// add new Centroid to list
+				i++;
 			}
 		}
 	}

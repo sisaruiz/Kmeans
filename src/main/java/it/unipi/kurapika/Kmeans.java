@@ -62,6 +62,8 @@ public class Kmeans {
             
             job.setOutputKeyClass(Centroid.class);
             job.setOutputValueClass(NullWritable.class);
+	    job.setMapOutputKeyClass(Centroid.class);
+	    job.setMapOutputValueClass(Point.class);
             
             FileInputFormat.addInputPath(job, new Path(INPUT));
             FileOutputFormat.setOutputPath(job, new Path(OUTPUT));

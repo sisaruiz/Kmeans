@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class Centroid implements WritableComparable<Centroid>{
 	
-	private Text index;
+	private Text index = new Text();
 	private Point point;
 	
 	public Centroid() {

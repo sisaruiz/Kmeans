@@ -13,16 +13,16 @@ import java.util.Arrays;
 public class Point implements Writable {
 	
 	private IntWritable dimension;
-	private ArrayPrimitiveWritable coordinates = null;
+	private ArrayPrimitiveWritable coordinates = new ArrayPrimitiveWritable();
 	private IntWritable numPoints = new IntWritable();
 	
 	public Point() {
 		this.dimension = new IntWritable(0);
-		this.coordinates = new ArrayPrimitiveWritable();
 		double[] vector = new double[this.dimension.get()];
 		for (int i=0; i<this.dimension.get(); i++) {
 			vector[i] = 0;
 		}
+		this.coordinates.set(vector);
 		this.numPoints.set(1);
 	}
 	

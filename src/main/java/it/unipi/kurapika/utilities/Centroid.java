@@ -22,9 +22,9 @@ public class Centroid implements WritableComparable<Centroid>{
         point = new Point(center.point);
 	}
 	
-	public Centroid(Text index, Point point) {
+	public Centroid(String index, Point point) {
 		
-		this.index = index;
+		this.index.set(index);
 		this.point = point;
 	}
 

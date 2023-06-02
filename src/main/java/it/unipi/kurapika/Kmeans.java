@@ -33,8 +33,8 @@ public class Kmeans {
         // set parameters
         final String INPUT = otherArgs[0];
         final String OUTPUT = otherArgs[1] + "/temp";
-        final int DATASET_SIZE = conf.getInt("dataset", 100);
-        final String CENTROIDS_PATH = conf.get("centroids");
+        final int DATASET_SIZE = conf.getInt("dataset.size", 100);
+        final String CENTROIDS_PATH = conf.getString("centroids.path", "centroids.txt");
         final int K = conf.getInt("k", 3);
         final int MAX_ITERATIONS = conf.getInt("iterations", 20);
 

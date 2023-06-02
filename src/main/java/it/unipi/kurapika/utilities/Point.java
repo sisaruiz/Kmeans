@@ -14,7 +14,7 @@ public class Point implements Writable {
 	
 	private IntWritable dimension;
 	private ArrayPrimitiveWritable coordinates = null;
-	private IntWritable numPoints;
+	private IntWritable numPoints = new IntWritable();
 	
 	public Point() {
 		this.dimension = new IntWritable(0);

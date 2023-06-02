@@ -58,7 +58,7 @@ public class KmeansReducer extends Reducer<Centroid, Point, Centroid, NullWritab
 	protected void cleanup(Context context) throws IOException, InterruptedException {
 
 		Configuration conf = context.getConfiguration();
-		Path outPath = new Path(conf.get("centroids"));		// get path of centroids sequence file
+		Path outPath = new Path(conf.get("centroids.path", "centroids.txt"));		// get path of centroids sequence file
 		FileSystem fs = FileSystem.get(conf);
 		fs.delete(outPath, true);				// if path exists delete it
 		try (SequenceFile.Writer out = SequenceFile.createWriter(conf, SequenceFile.Writer.file(outPath),

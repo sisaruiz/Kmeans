@@ -16,7 +16,7 @@ import it.unipi.kurapika.utilities.*;
 
 public class KmeansMapper extends Mapper<LongWritable, Text, Centroid, Point>{
 	
-	private Point point;						// datapoint to be examined
+	private Point point = new Point();				// datapoint to be examined
 	private List<Centroid> centroids = new ArrayList<>();		// list of centroids
 
 	// for each task first initialize centroids

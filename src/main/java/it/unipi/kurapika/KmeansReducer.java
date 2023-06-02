@@ -62,7 +62,7 @@ public class KmeansReducer extends Reducer<Centroid, Point, Centroid, NullWritab
 		FileSystem fs = FileSystem.get(conf);
 		fs.delete(outPath, true);				// if path exists delete it
 		try (SequenceFile.Writer out = SequenceFile.createWriter(conf, SequenceFile.Writer.file(outPath),
-				SequenceFile.Writer.keyClass(Centroid.class))) {
+				SequenceFile.Writer.keyClass(Centroid.class), SequenceFile.Writer.valueClass(IntWritable.class))) {
 			final IntWritable value = new IntWritable(0);
 			for (Centroid center : centers) {	
 				out.append(center, value);		// write new centroids in sequence file

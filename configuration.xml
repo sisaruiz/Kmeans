@@ -8,7 +8,7 @@
   </property>
   <property>
     <name>centroids.path</name>
-    <value>centroids.txt</value>
+    <value>centroids.seq</value>
     <description>file in which the centroids are stored</description>
   </property>
   <property>

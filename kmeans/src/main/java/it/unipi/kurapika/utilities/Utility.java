@@ -20,7 +20,8 @@ import org.apache.hadoop.conf.Configuration;
 
 public class Utility {
 
-	public static Point[] generateCentroids(Configuration conf, String pathString, int k, int dataSetSize) 
+	// generates centroids and stores them in conf
+	public static void generateCentroids(Configuration conf, Path inPath, int k, int dataSetSize) 
 		      throws IOException {
 		    	Point[] points = new Point[k];
 		    	
@@ -38,9 +39,8 @@ public class Utility {
 		        Collections.sort(positions);
 		        
 		        //File reading utils
-		        Path dataPath = new Path(pathString);
 		        FileSystem hdfs = FileSystem.get(conf);
-		        FSDataInputStream in = hdfs.open(dataPath);
+		        FSDataInputStream in = hdfs.open(inPath);
 		        BufferedReader br = new BufferedReader(new InputStreamReader(in));
 
 		        //Get centroids from the file
@@ -73,7 +73,7 @@ public class Utility {
 		}
 	}
 	
-	public static void writeOutput(Configuration conf, Path centroidsPath, Path outpath) throws IOException {
+	public static void writeOutput(Configuration conf, Path outpath) throws IOException {
 	
 		List<Centroid> centroids = new ArrayList<>();		// list of centroids
 

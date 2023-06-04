@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!-- configuration.xml -->
+<configuration>
+  <property>
+    <name>dataset.size</name>
+    <value>100</value>
+    <description>number of points in dataset</description>
+  </property>
+  <property>
+    <name>centroids.path</name>
+    <value>centroids.seq</value>
+    <description>file in which the centroids are stored</description>
+  </property>
+  <property>
+    <name>k</name>
+    <value>4</value>
+    <description>number of clusters required</description>
+  </property>
+  <property>
+    <name>iterations</name>
+    <value>25</value>
+    <description>max number of iterations</description>
+  </property>
+</configuration>

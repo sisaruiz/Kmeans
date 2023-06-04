@@ -1,0 +1,8 @@
+it/unipi/kurapika/Kmeans.class
+it/unipi/kurapika/KmeansMapper.class
+it/unipi/kurapika/utilities/Point.class
+it/unipi/kurapika/KmeansCombiner.class
+it/unipi/kurapika/utilities/Centroid.class
+it/unipi/kurapika/KmeansReducer$Counter.class
+it/unipi/kurapika/KmeansReducer.class
+it/unipi/kurapika/utilities/Utility.class

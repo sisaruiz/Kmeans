@@ -20,7 +20,7 @@ public class Point implements Writable {
 		this.dimension = new IntWritable(0);
 		double[] vector = new double[this.dimension.get()];
 		for (int i=0; i<this.dimension.get(); i++) {
-			vector[i] = 0;
+			vector[i] = 0.0;
 		}
 		this.coordinates.set(vector);
 		this.numPoints.set(1);

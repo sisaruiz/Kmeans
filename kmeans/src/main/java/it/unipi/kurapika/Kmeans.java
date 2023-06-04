@@ -64,6 +64,7 @@ public class Kmeans {
             job.setOutputValueClass(Text.class);
             
             FileInputFormat.addInputPath(job, inputPath);
+            outputPath.getFileSystem(conf).delete(outputPath, true);
             FileOutputFormat.setOutputPath(job, outputPath);
             
             job.setInputFormatClass(TextInputFormat.class);
@@ -81,8 +82,6 @@ public class Kmeans {
 
             // if centroids converged or the maximum number of iterations has been reached
             if(stop || iteration == (conf.getInt("max.iterations", 20) -1)) {
-            	// write final centroids in output file
-                Utility.writeOutput(conf, outputPath);
                 stop = true;	// stop iterations
             }
         }

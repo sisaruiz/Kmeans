@@ -22,10 +22,10 @@ public class Centroid implements WritableComparable<Centroid>{
         point = new Point(center.point);
 	}
 	
-	public Centroid(String index, Point point) {
-		
+	public Centroid(String index, String values) {
+		this();
 		this.index.set(index);
-		this.point = point;
+		this.point.parse(values);
 	}
 
 	@Override

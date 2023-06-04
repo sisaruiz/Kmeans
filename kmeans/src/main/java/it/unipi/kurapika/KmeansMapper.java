@@ -16,27 +16,20 @@ import it.unipi.kurapika.utilities.*;
 
 public class KmeansMapper extends Mapper<LongWritable, Text, Centroid, Point>{
 	
-	private Point point = new Point();						// datapoint to be examined
+	private Point point = new Point();							// datapoint to be examined
 	private List<Centroid> centroids = new ArrayList<>();		// list of centroids
 
 	// for each task first initialize centroids
 	@Override
 	protected void setup(Context context) throws IOException, InterruptedException {
 		
+		super.setup(context);
 		Configuration conf = context.getConfiguration();
-		Path centroidsPath = new Path(conf.get("centroids.path", "centroids.seq")); 	// path containing sequence file to read
-
-		try (SequenceFile.Reader reader = new SequenceFile.Reader(conf, SequenceFile.Reader.file(centroidsPath))) {
-			
-			Point key = new Point();
-			int i = 0;
-
-			while (reader.next(key)) {			// iterate over records
-				Centroid center = new Centroid(String.valueOf(i), key);	// create new centroid 
-				centroids.add(center);			// add new Centroid to list
-				i++;
-			}
-		}
+		String[] lines = context.getConfiguration().getStrings("centroids");
+        
+        // get centroids' values
+        for(int i = 0; i < lines.length; i++)
+            centroids.add(new Centroid(Integer.toString(i),lines[i]));
 	}
 	
 	// for each record (datapoint) assign closest centroid
@@ -44,16 +37,16 @@ public class KmeansMapper extends Mapper<LongWritable, Text, Centroid, Point>{
 	protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 		
 		Centroid cluster = new Centroid();			// centroid to be assigned
-		point.parse(value.toString());			// convert data value to Point
+		point.parse(value.toString());				// convert data value to Point object
 		
 		double minimumDistance = Double.MAX_VALUE;	// assign maximum value as default minimum distance
 		
-		for(int i=0; i<centroids.size(); i++) {		// for each centroid
+		for(int i=0; i<centroids.size(); i++) {									// for each centroid
 			double distance = point.getDistance(centroids.get(i).getPoint());	// calculate distance from point to centroid
-			if (distance < minimumDistance) {	// if distance is shorter than the previous ones
-                		cluster = centroids.get(i);	// assign new centroid to point
-                		minimumDistance = distance;	// update minimumDistance with new value
-            		}
+			if (distance < minimumDistance) {	// if distance is shorter than previous ones
+                	cluster = centroids.get(i);	// assign new centroid to point
+                	minimumDistance = distance;	// update minimumDistance with new distance
+            }
 		}
 		
 		context.write(cluster, point);			// write output record (key: cluster, value: point)

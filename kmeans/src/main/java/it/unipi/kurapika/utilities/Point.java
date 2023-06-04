@@ -23,7 +23,7 @@ public class Point implements Writable {
 			vector[i] = 0.0;
 		}
 		this.coordinates.set(vector);
-		this.numPoints.set(1);
+		this.numPoints.set(0);
 	}
 	
 	public Point(Point point) {
@@ -58,6 +58,7 @@ public class Point implements Writable {
 
         coordinates.set(tmp);
         dimension.set(coords.length);
+        numPoints.set(1);
     }
 	
 	public double getDistance(Point centroid) {
@@ -94,18 +95,15 @@ public class Point implements Writable {
 		this.numPoints.set(1);
 	}
 	
-	public String toString() {
-		String string = new String();
-		double [] thisCoord = (double[])this.coordinates.get();
-		
-		for(int i=0; i<this.dimension.get(); i++) {
-			string.concat(Double.toString(thisCoord[i]));
-			string.concat(" ");
-		}
-		string.concat("\n");
-		
-		return string;
-	}
+	@Override
+    public String toString(){
+        String temp = "";
+        double [] thisCoord = (double[])this.coordinates.get();
+        
+        for (int i = 0; i < dimension.get() ; i++)
+            temp += thisCoord[i] + " ";
+        return temp;
+    }
 }
 
 

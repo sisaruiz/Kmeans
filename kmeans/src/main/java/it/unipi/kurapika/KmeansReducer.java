@@ -1,12 +1,8 @@
 package it.unipi.kurapika;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.NullWritable;
-import org.apache.hadoop.io.SequenceFile;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 
 import java.io.IOException;
 import java.util.List;
@@ -14,7 +10,7 @@ import java.util.ArrayList;
 
 import it.unipi.kurapika.utilities.*;
 
-public class KmeansReducer extends Reducer<Centroid, Point, Centroid, NullWritable>{
+public class KmeansReducer extends Reducer<Centroid, Point, Text, Text>{
 	
 	public static enum Counter {
 		// Global counter: it gets incremented every time new centroids are more than epsilon distant from previous centroids
@@ -26,48 +22,51 @@ public class KmeansReducer extends Reducer<Centroid, Point, Centroid, NullWritab
 	private Double epsilon = 0.;		// convergence parameter 
 	
 	@Override
-	protected void setup(Context context) {
+	protected void setup(Context context) throws IOException, InterruptedException {
+		
+		super.setup(context);
 	    Configuration conf = context.getConfiguration();
-	    epsilon = conf.getDouble("epsilon", 0.0001);	// initialize convergence parameter with value in configuration file
+	    epsilon = conf.getDouble("epsilon", 0.001);	// initialize convergence parameter with value in configuration file
 	}
 	
 	// for each cluster calculate new centroids
-        @Override
-        protected void reduce(Centroid key, Iterable<Point> partialSums, Context context) throws IOException, InterruptedException {
+    @Override
+    protected void reduce(Centroid key, Iterable<Point> partialSums, Context context) throws IOException, InterruptedException {
     	
-    	    Centroid newKey = new Centroid();			// new centroid
+    	Centroid newKey = new Centroid();			// new centroid
+    	Text label = new Text();
     	
-    	    for (Point point : partialSums) {			// summation of partial sums 
-    		newKey.getPoint().sum(point);	
-    	    }
-    	    newKey.getPoint().compress();			// divide for number of points in cluster
-    	    newKey.setIndex(key);				// assign old centroid's index to new centroid
+    	for (Point point : partialSums) {			// summation of partial sums 
+    	    newKey.getPoint().sum(point);	
+    	}
+    	newKey.getPoint().compress();				// divide for number of points in cluster
+    	newKey.setIndex(key);						// assign old centroid's index to new centroid
+   
+    	centers.add(newKey);						// add new centroid to new centroids list
+    	label.set(newKey.toString());				// get its coordinates in Text format
     	
-    	    centers.add(newKey);				// add new centroid to new centroids list
-	    context.write(newKey, NullWritable.get());		// write output record (key: centroid, value: null)
+    	context.write(newKey.getLabel(), label);			// write output record (key: centroid, value: null)
     	
-	    // calculate distance between new centroid and old centroid
-	    double distance = key.getPoint().getDistance(newKey.getPoint());
-    	    if (distance > epsilon) {				// if distance is greater than epsilon
-    		context.getCounter(Counter.CONVERGED).increment(1);	// increment global counter
-    	    }
-        }
+    	// calculate distance between new centroid and old centroid
+    	double distance = key.getPoint().getDistance(newKey.getPoint());
+    	if (distance > epsilon) {				// if distance is greater than epsilon
+    	    context.getCounter(Counter.CONVERGED).increment(1);	// increment global counter
+    	}
+    }
     	
-	// write new centroids in sequence file
-    	@Override
+	// store new coordinates
+    @Override
 	protected void cleanup(Context context) throws IOException, InterruptedException {
 
 		Configuration conf = context.getConfiguration();
-		Path outPath = new Path(conf.get("centroids.path", "centroids.seq"));		// get path of centroids sequence file
-		FileSystem fs = FileSystem.get(conf);
-		fs.delete(outPath, true);				// if path exists delete it
-		try (SequenceFile.Writer out = SequenceFile.createWriter(conf, SequenceFile.Writer.file(outPath),
-				SequenceFile.Writer.keyClass(Centroid.class), SequenceFile.Writer.valueClass(IntWritable.class))) {
-			final IntWritable value = new IntWritable(0);
-			for (Centroid center : centers) {	
-				out.append(center, value);		// write new centroids in sequence file
-			}
+		int numberClusters = conf.getInt("k", 4);
+		String[] result = new String[numberClusters];
+		
+		int index = 0;
+		for(Centroid newCentroid : centers) {
+			result[index] = newCentroid.getPoint().toString();
 		}
+		conf.setStrings("centroids", result);
 	}
     
 }

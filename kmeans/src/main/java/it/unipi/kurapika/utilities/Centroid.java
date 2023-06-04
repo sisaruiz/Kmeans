@@ -25,7 +25,7 @@ public class Centroid implements WritableComparable<Centroid>{
 	public Centroid(String index, String values) {
 		this();
 		this.index.set(index);
-		this.point.parse(values);
+		point.parse(values);		
 	}
 
 	@Override
@@ -46,6 +46,10 @@ public class Centroid implements WritableComparable<Centroid>{
 	public int compareTo(Centroid o) {
 		// TODO Auto-generated method stub
 		return this.index.compareTo(o.index);
+	}
+	
+	public Text getLabel(){
+		return this.index;
 	}
 	
 	public Point getPoint() {

@@ -12,6 +12,7 @@ public class KmeansCombiner extends Reducer<Centroid, Point, Centroid, Point>{
     protected void reduce(Centroid key, Iterable<Point> points, Context context) throws IOException, InterruptedException {
     	
         Point partialSum = new Point();	// new point standing for all points belonging to the same cluster and on the same machine
+        partialSum.setForSum(key.getDim());
         
         for (Point point : points) {
             partialSum.sum(point);		// add points to partial sum

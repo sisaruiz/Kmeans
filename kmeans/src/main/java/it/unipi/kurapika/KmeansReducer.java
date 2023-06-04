@@ -34,6 +34,7 @@ public class KmeansReducer extends Reducer<Centroid, Point, Text, Text>{
     protected void reduce(Centroid key, Iterable<Point> partialSums, Context context) throws IOException, InterruptedException {
     	
     	Centroid newKey = new Centroid();			// new centroid
+    	newKey.getPoint().setForSum(key.getDim());	// assign 0 value to coordinates of new centroid
     	Text label = new Text();
     	
     	for (Point point : partialSums) {			// summation of partial sums 

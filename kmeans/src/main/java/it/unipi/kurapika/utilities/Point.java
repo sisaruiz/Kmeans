@@ -8,45 +8,22 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import java.util.Arrays;
-
 public class Point implements Writable {
 	
 	private IntWritable dimension;
-	private ArrayPrimitiveWritable coordinates = new ArrayPrimitiveWritable();
-	private IntWritable numPoints = new IntWritable();
+	private ArrayPrimitiveWritable coordinates;
+	private IntWritable numPoints;
 	
 	public Point() {
-		this.dimension = new IntWritable(0);
-		double[] vector = new double[this.dimension.get()];
-		for (int i=0; i<this.dimension.get(); i++) {
-			vector[i] = 0.0;
-		}
-		this.coordinates.set(vector);
-		this.numPoints.set(0);
+		dimension = new IntWritable();
+		coordinates = new ArrayPrimitiveWritable();
+		numPoints = new IntWritable();
 	}
 	
 	public Point(Point point) {
-		this.dimension = point.dimension;
-		double[] vector = (double[])point.coordinates.get();
-        this.coordinates.set(Arrays.copyOf(vector, vector.length));
-        this.numPoints.set(point.numPoints.get());
-	}
-	
-	@Override
-	public void write(DataOutput out) throws IOException {
-		// TODO Auto-generated method stub
-		dimension.write(out);
-		coordinates.write(out);
-		numPoints.write(out);
-	}
-
-	@Override
-	public void readFields(DataInput in) throws IOException {
-		// TODO Auto-generated method stub
-		dimension.readFields(in);
-		coordinates.readFields(in);
-		numPoints.readFields(in);
+		dimension = point.dimension;
+        coordinates = point.coordinates;
+        numPoints = point.numPoints;
 	}
 	
 	public void parse(String values) {
@@ -95,6 +72,36 @@ public class Point implements Writable {
 		this.numPoints.set(1);
 	}
 	
+	public void setForSum(int size) {
+		numPoints.set(0);
+		double[] vector = new double[size];
+		for (int i=0; i<size; i++) {
+			vector[i] = 0.0;
+		}
+		coordinates.set(vector);
+		dimension.set(size);
+	}
+	
+	public int getDim() {
+		return dimension.get();
+	}
+	
+	@Override
+	public void write(DataOutput out) throws IOException {
+		// TODO Auto-generated method stub
+		dimension.write(out);
+		coordinates.write(out);
+		numPoints.write(out);
+	}
+
+	@Override
+	public void readFields(DataInput in) throws IOException {
+		// TODO Auto-generated method stub
+		dimension.readFields(in);
+		coordinates.readFields(in);
+		numPoints.readFields(in);
+	}
+		
 	@Override
     public String toString(){
         String temp = "";

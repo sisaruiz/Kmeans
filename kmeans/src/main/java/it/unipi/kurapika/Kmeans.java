@@ -24,8 +24,8 @@ public class Kmeans {
 
         String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
 
-        if (otherArgs.length != 4) {
-            System.err.println("Usage: <input> <output> <n_clusters> <dataset_size>");
+        if (otherArgs.length != 5) {
+            System.err.println("Usage: <input> <output> <n_clusters> <dataset_size> <max_n_iter>");
             System.exit(1);
         }
 
@@ -34,9 +34,9 @@ public class Kmeans {
         final Path outputPath = new Path(otherArgs[1]);
         final int k = Integer.parseInt(otherArgs[2]);
         final int datasetSize = Integer.parseInt(otherArgs[3]);
+        final int maxIter = Integer.parseInt(otherArgs[4]);
 	
         // set default parameters
-        conf.setInt("max.iterations", 20);
         conf.setDouble("epsilon", 1.0);
 
         // generate initial centroids
@@ -81,12 +81,12 @@ public class Kmeans {
             stop = (0L == job.getCounters().findCounter(KmeansReducer.Counter.CONVERGED).getValue());
 
             // if centroids converged or the maximum number of iterations has been reached
-            if(stop || iteration == (conf.getInt("max.iterations", 20) -1)) {
+            if(stop || iteration == (maxIter) ) {
                 stop = true;	// stop iterations
             }
         }
         
-        System.out.println("n_iter: " + (iteration+1));
+        System.out.println("n_iter: " + (iteration));
 
         System.exit(0);		
 		

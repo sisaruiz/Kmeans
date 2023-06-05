@@ -19,14 +19,14 @@ public class KmeansReducer extends Reducer<Centroid, Point, Text, Text>{
 	
 	private final List<Centroid> centers = new ArrayList<>();  // list containing new centroids
 	
-	private Double epsilon = 0.;		// convergence parameter 
+	private Double epsilon = 10.0;		// convergence parameter 
 	
 	@Override
 	protected void setup(Context context) throws IOException, InterruptedException {
 		
 		super.setup(context);
 	    Configuration conf = context.getConfiguration();
-	    epsilon = conf.getDouble("epsilon", 0.001);	// initialize convergence parameter with value in configuration file
+	    epsilon = conf.getDouble("epsilon", 10.0);	// initialize convergence parameter with value in configuration file
 	}
 	
 	// for each cluster calculate new centroids
@@ -46,26 +46,27 @@ public class KmeansReducer extends Reducer<Centroid, Point, Text, Text>{
     	centers.add(newKey);						// add new centroid to new centroids list
     	label.set(newKey.toString());				// get its coordinates in Text format
     	
-    	context.write(newKey.getLabel(), label);			// write output record (key: centroid, value: null)
+    	context.write(newKey.getLabel(), label);	// write output record (key: centroid, value: null)
     	
     	// calculate distance between new centroid and old centroid
     	double distance = key.getPoint().getDistance(newKey.getPoint());
-    	if (distance > epsilon) {				// if distance is greater than epsilon
-    	    context.getCounter(Counter.CONVERGED).increment(1);	// increment global counter
+    	if (distance > epsilon) {					// if distance is greater than epsilon
+    	    context.getCounter(Counter.CONVERGED).increment(1);	// increment counter
     	}
     }
-    	
+    
 	// store new coordinates
     @Override
 	protected void cleanup(Context context) throws IOException, InterruptedException {
-
+    	super.cleanup(context);
 		Configuration conf = context.getConfiguration();
 		int numberClusters = conf.getInt("k", 4);
 		String[] result = new String[numberClusters];
 		
 		int index = 0;
 		for(Centroid newCentroid : centers) {
-			result[index] = newCentroid.getPoint().toString();
+			result[index] = newCentroid.toString();
+			index++;
 		}
 		conf.setStrings("centroids", result);
 	}

@@ -14,19 +14,13 @@ public class Point implements Writable {
 	private ArrayPrimitiveWritable coordinates;
 	private IntWritable numPoints;
 	
-	public Point() {
+	public Point() {	// actually used
 		dimension = new IntWritable();
 		coordinates = new ArrayPrimitiveWritable();
 		numPoints = new IntWritable();
 	}
 	
-	public Point(Point point) {
-		dimension = point.dimension;
-        coordinates = point.coordinates;
-        numPoints = point.numPoints;
-	}
-	
-	public void parse(String values) {
+	public void parse(String values) {	// used
         String[] coords = values.split(" ");
         double[] tmp = new double[coords.length];
         for (int i = 0; i < tmp.length; i++) {
@@ -38,8 +32,8 @@ public class Point implements Writable {
         numPoints.set(1);
     }
 	
-	public double getDistance(Point centroid) {
-		double sum = 0;
+	public double getDistance(Point centroid) {	// used
+		double sum = 0.0;
 		double [] thisCoord = (double[])this.coordinates.get();
 		double [] centrCoord = (double[])centroid.coordinates.get();
 		
@@ -49,7 +43,7 @@ public class Point implements Writable {
         return Math.sqrt(sum);
 	}
 	
-	public void sum(Point p) {
+	public void sum(Point p) {	// used
 		double [] thisCoord = (double[])this.coordinates.get();
 		double [] otherCoord = (double[])p.coordinates.get();
 		
@@ -62,27 +56,27 @@ public class Point implements Writable {
         this.numPoints.set(this.numPoints.get()+p.numPoints.get());
 	}
 	
-	public void compress() {
-		double [] toUpdateCoord = (double[])this.coordinates.get();
+	public void compress() {	// used
+		double [] toUpdateCoord = (double[])coordinates.get();
 		
-		for(int i=0; i<this.dimension.get(); i++) {
-			toUpdateCoord[i] = toUpdateCoord[i]/this.numPoints.get();
+		for(int i=0; i<dimension.get(); i++) {
+			toUpdateCoord[i] = toUpdateCoord[i]/(numPoints.get());
 		}
-		this.coordinates.set(toUpdateCoord);
-		this.numPoints.set(1);
+		coordinates.set(toUpdateCoord);
+		numPoints.set(1);
 	}
 	
-	public void setForSum(int size) {
-		numPoints.set(0);
+	public void setForSum(int size) {	// used
 		double[] vector = new double[size];
 		for (int i=0; i<size; i++) {
 			vector[i] = 0.0;
 		}
 		coordinates.set(vector);
 		dimension.set(size);
+		numPoints.set(0);
 	}
 	
-	public int getDim() {
+	public int getDim() {	// used
 		return dimension.get();
 	}
 	
@@ -103,7 +97,7 @@ public class Point implements Writable {
 	}
 		
 	@Override
-    public String toString(){
+    public String toString(){	// used
         String temp = "";
         double [] thisCoord = (double[])this.coordinates.get();
         

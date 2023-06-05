@@ -9,23 +9,18 @@ import java.io.IOException;
 
 public class Centroid implements WritableComparable<Centroid>{
 	
-	private Text index = new Text();
+	private Text index;
 	private Point point;
 	
-	public Centroid() {
+	public Centroid() {	// used
 		index = new Text();
         point = new Point();
 	}
 	
-	public Centroid(Centroid center) {
-		this.index = center.index;
-        point = new Point(center.point);
-	}
-	
-	public Centroid(String index, String values) {
+	public Centroid(String label, String values) {	// used
 		this();
-		this.index.set(index);
-		point.parse(values);		
+		index.set(label);
+		point.parse(values);	
 	}
 
 	@Override
@@ -38,8 +33,8 @@ public class Centroid implements WritableComparable<Centroid>{
 	@Override
 	public void readFields(DataInput in) throws IOException {
 		// TODO Auto-generated method stub
-		 index.readFields(in);
-	     point.readFields(in);
+		index.readFields(in);
+	    point.readFields(in);
 	}
 
 	@Override
@@ -48,20 +43,25 @@ public class Centroid implements WritableComparable<Centroid>{
 		return this.index.compareTo(o.index);
 	}
 	
-	public Text getLabel(){
+	public Text getLabel(){	// used
 		return this.index;
 	}
 	
-	public Point getPoint() {
+	public Point getPoint() {	// used
 		return this.point;
 	}
 	
-	public void setIndex(Centroid cen) {
+	public void setIndex(Centroid cen) {	// used
 		this.index.set(cen.index);
 	}
 	
-	public int getDim() {
+	public int getDim() {	// used
 		return point.getDim();
+	}
+	
+	@Override
+	public String toString() {		//  used
+		return point.toString();
 	}
 
 }

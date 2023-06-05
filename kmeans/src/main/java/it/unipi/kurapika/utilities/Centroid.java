@@ -12,12 +12,12 @@ public class Centroid implements WritableComparable<Centroid>{
 	private Text index;
 	private Point point;
 	
-	public Centroid() {	// used
+	public Centroid() {	
 		index = new Text();
         point = new Point();
 	}
 	
-	public Centroid(String label, String values) {	// used
+	public Centroid(String label, String values) {			
 		this();
 		index.set(label);
 		point.parse(values);	
@@ -43,24 +43,24 @@ public class Centroid implements WritableComparable<Centroid>{
 		return this.index.compareTo(o.index);
 	}
 	
-	public Text getLabel(){	// used
+	public Text getLabel(){	
 		return this.index;
 	}
 	
-	public Point getPoint() {	// used
+	public Point getPoint() {	
 		return this.point;
 	}
 	
-	public void setIndex(Centroid cen) {	// used
+	public void setIndex(Centroid cen) {	
 		this.index.set(cen.index);
 	}
 	
-	public int getDim() {	// used
+	public int getDim() {	
 		return point.getDim();
 	}
 	
 	@Override
-	public String toString() {		//  used
+	public String toString() {	
 		return point.toString();
 	}
 

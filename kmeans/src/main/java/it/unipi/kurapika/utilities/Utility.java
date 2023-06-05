@@ -2,16 +2,13 @@ package it.unipi.kurapika.utilities;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
 import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.conf.Configuration;
@@ -55,23 +52,5 @@ public class Utility {
 		br.close();
 		// save centroids
 		conf.setStrings("centroids", centroids);
-	}
-	
-	public static void writeOutputFile(Configuration conf, Path outpath) throws IOException {
-		
-		FileSystem hdfs = FileSystem.get(conf);
-        FSDataOutputStream dos = hdfs.create(outpath, true);
-        BufferedWriter br = new BufferedWriter(new OutputStreamWriter(dos));
-
-        // get centroids
-        String[] lines = conf.getStrings("centroids");
-        
-        // print centroids in output file
-        for(int i = 0; i < lines.length; i++) {
-        	br.write(lines[i]);
-        	br.newLine();
-        }
-        br.close();
-        hdfs.close();
-	}
+	}	
 }

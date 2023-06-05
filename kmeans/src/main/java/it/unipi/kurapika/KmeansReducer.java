@@ -19,14 +19,14 @@ public class KmeansReducer extends Reducer<Centroid, Point, Text, Text>{
 	
 	private final List<Centroid> centers = new ArrayList<>();  // list containing new centroids
 	
-	private Double epsilon = 10.0;		// convergence parameter 
+	private Double epsilon = 1.0;		// convergence parameter 
 	
 	@Override
 	protected void setup(Context context) throws IOException, InterruptedException {
 		
 		super.setup(context);
 	    Configuration conf = context.getConfiguration();
-	    epsilon = conf.getDouble("epsilon", 10.0);	// initialize convergence parameter with value in configuration file
+	    epsilon = conf.getDouble("epsilon", 20.0);	// initialize convergence parameter with value in configuration file
 	}
 	
 	// for each cluster calculate new centroids

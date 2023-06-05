@@ -36,8 +36,8 @@ public class Kmeans {
         final int datasetSize = Integer.parseInt(otherArgs[3]);
 	
         // set default parameters
-        conf.setInt("max.iterations", 4);
-        conf.setDouble("epsilon", 10.0);
+        conf.setInt("max.iterations", 20);
+        conf.setDouble("epsilon", 1.0);
 
         // generate initial centroids
         Utility.generateCentroids(conf, inputPath, k, datasetSize);
@@ -81,13 +81,12 @@ public class Kmeans {
             stop = (0L == job.getCounters().findCounter(KmeansReducer.Counter.CONVERGED).getValue());
 
             // if centroids converged or the maximum number of iterations has been reached
-            if(stop || iteration == (conf.getInt("max.iterations", 10) -1)) {
+            if(stop || iteration == (conf.getInt("max.iterations", 20) -1)) {
                 stop = true;	// stop iterations
-                //Utility.writeOutputFile(conf, outputPath);
             }
         }
         
-        System.out.println("n_iter: " + iteration);
+        System.out.println("n_iter: " + (iteration+1));
 
         System.exit(0);		
 		

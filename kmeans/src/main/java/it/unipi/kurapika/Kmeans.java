@@ -77,6 +77,9 @@ public class Kmeans {
                 System.exit(2);	
             }
 
+            // set new centroids
+            Utility.setNewCentroids(conf, outputPath, k);
+            
             // check centroids' convergence
             stop = (0L == job.getCounters().findCounter(KmeansReducer.Counter.CONVERGED).getValue());
 

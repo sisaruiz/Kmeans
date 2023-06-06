@@ -3,6 +3,7 @@ package it.unipi.kurapika.utilities;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,6 +15,8 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.conf.Configuration;
 
 public class Utility {
+	
+	final static String FILE_NAME = "part-r-000";
 
 	// generate random k centroids
 	public static void generateCentroids(Configuration conf, Path inPath, int k, int dataSetSize) throws IOException {
@@ -30,7 +33,7 @@ public class Utility {
 		    }
 		}
 		Collections.sort(positions);
-		        
+		  
 		// get elements
 		FileSystem hdfs = FileSystem.get(conf);
 		FSDataInputStream in = hdfs.open(inPath);
@@ -52,5 +55,46 @@ public class Utility {
 		br.close();
 		// save centroids
 		conf.setStrings("centroids", centroids);
-	}	
+	}
+	
+	public static void setNewCentroids(Configuration conf, Path outPath, int clusters) {
+		
+		BufferedReader br = null;
+        FileSystem fs = null;
+        String [] centroids = new String[clusters];
+        
+        // Merging output files from multiple reducers
+        for(int fileNumber = 0; fileNumber < clusters; fileNumber++ ){
+            String name = "";
+            if(fileNumber < 10)
+                name = "0" + fileNumber;
+            else 
+                name = String.valueOf(fileNumber);
+            String path = outPath + "/" + FILE_NAME + name;
+            Path pt = new Path(path);
+            try {
+                // The lines of the output files are inspected and the shift for the new centroids is computed
+                fs = outPath.getFileSystem(conf);
+                br = new BufferedReader(new InputStreamReader(fs.open(pt)));
+                String line;
+                String temp = "";
+                while((line = br.readLine()) != null){ 
+                    String[] split = line.split("\\s+");
+                    for(int j = 1; j < split.length; j++)
+                        temp += split[j] + " ";
+                    centroids[fileNumber] = temp;
+                    temp = "";
+                }
+                br.close();
+                fs.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } 
+        }
+
+        // add to conf
+        conf.setStrings("centroids", centroids);
+	}
 }

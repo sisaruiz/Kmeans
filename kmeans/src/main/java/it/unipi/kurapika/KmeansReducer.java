@@ -53,22 +53,5 @@ public class KmeansReducer extends Reducer<Centroid, Point, Text, Text>{
     	if (distance > epsilon) {					// if distance is greater than epsilon
     	    context.getCounter(Counter.CONVERGED).increment(1);	// increment counter
     	}
-    }
-    
-	// store new coordinates
-    @Override
-	protected void cleanup(Context context) throws IOException, InterruptedException {
-    	super.cleanup(context);
-		Configuration conf = context.getConfiguration();
-		int numberClusters = conf.getInt("k", 4);
-		String[] result = new String[numberClusters];
-		
-		int index = 0;
-		for(Centroid newCentroid : centers) {
-			result[index] = newCentroid.toString();
-			index++;
-		}
-		conf.setStrings("centroids", result);
-	}
-    
+    }    
 }

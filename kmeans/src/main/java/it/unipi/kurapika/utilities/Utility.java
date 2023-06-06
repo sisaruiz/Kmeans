@@ -62,6 +62,7 @@ public class Utility {
 		BufferedReader br = null;
         FileSystem fs = null;
         String [] centroids = new String[clusters];
+        int index = 0;
         
         // Merging output files from multiple reducers
         for(int fileNumber = 0; fileNumber < clusters; fileNumber++ ){
@@ -78,12 +79,13 @@ public class Utility {
                 br = new BufferedReader(new InputStreamReader(fs.open(pt)));
                 String line;
                 String temp = "";
-                while((line = br.readLine()) != null){ 
+                while((line = br.readLine()) != null){
                     String[] split = line.split("\\s+");
                     for(int j = 1; j < split.length; j++)
                         temp += split[j] + " ";
-                    centroids[fileNumber] = temp;
+                    centroids[index] = temp;
                     temp = "";
+                    index++;
                 }
                 br.close();
                 fs.close();

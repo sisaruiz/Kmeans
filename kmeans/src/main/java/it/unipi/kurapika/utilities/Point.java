@@ -107,7 +107,3 @@ public class Point implements Writable {
     }
 }
 
-
-
-
-

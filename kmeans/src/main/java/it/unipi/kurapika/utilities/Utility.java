@@ -81,11 +81,19 @@ public class Utility {
                 String temp = "";
                 while((line = br.readLine()) != null){
                     String[] split = line.split("\\s+");
-                    for(int j = 1; j < split.length; j++)
-                        temp += split[j] + " ";
-                    centroids[index] = temp;
-                    temp = "";
-                    index++;
+                    int j=1;
+                    int i = j+conf.getInt("dim", 2);
+                    while(j<split.length) {
+                    	temp += split[j] + " ";
+                    	if (j == i) {
+                    		centroids[index] = temp;
+                    		temp ="";
+                    		i+=conf.getInt("dim", 2);
+                    		j++;
+                    		index++;
+                    	}
+                    	j++;
+                    }
                 }
                 br.close();
                 fs.close();

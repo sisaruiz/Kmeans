@@ -24,20 +24,22 @@ public class Kmeans {
 
         String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
 
-        if (otherArgs.length != 5) {
-            System.err.println("Usage: <input> <output> <n_clusters> <dataset_size> <max_n_iter>");
+        if (otherArgs.length != 6) {
+            System.err.println("Usage: <input> <output> <dimension> <n_clusters> <dataset_size> <max_n_iter>");
             System.exit(1);
         }
 
         // set custom parameters
         final Path inputPath = new Path(otherArgs[0]);
         final Path outputPath = new Path(otherArgs[1]);
-        final int k = Integer.parseInt(otherArgs[2]);
-        final int datasetSize = Integer.parseInt(otherArgs[3]);
-        final int maxIter = Integer.parseInt(otherArgs[4]);
+        final int dim = Integer.parseInt(otherArgs[2]);
+        final int k = Integer.parseInt(otherArgs[3]);
+        final int datasetSize = Integer.parseInt(otherArgs[4]);
+        final int maxIter = Integer.parseInt(otherArgs[5]);
 	
-        // set default parameters
+        // set parameters
         conf.setDouble("epsilon", 1.0);
+        conf.setInt("dim", dim);
 
         // generate initial centroids
         Utility.generateCentroids(conf, inputPath, k, datasetSize);

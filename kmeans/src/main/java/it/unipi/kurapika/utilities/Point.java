@@ -24,7 +24,7 @@ public class Point implements Writable {
         String[] coords = values.split(" ");
         double[] tmp = new double[coords.length];
         for (int i = 0; i < tmp.length; i++) {
-            tmp[i] = Double.valueOf(coords[i]);
+            tmp[i] = Double.parseDouble(coords[i]);
         }
 
         coordinates.set(tmp);

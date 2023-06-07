@@ -1,1 +1,1 @@
-# cloudcomputing
+# K-means algorithm implementation with MapReduce
